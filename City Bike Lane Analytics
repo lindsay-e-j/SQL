@@ -80,3 +80,13 @@ WITH safestLanes AS (
 )
 SELECT street, rating, 'Safe Lane' AS label
     FROM safestLanes;
+    
+--List all streets, their safety ratings, their avergae safety ratings, and recommendation label based on average safety rating.
+SELECT street, safetyrating,
+    AVG(safetyrating) OVER (PARTITION BY street) AS 'average_safety_rating',
+    CASE 
+        WHEN AVG(safetyrating) OVER (PARTITION BY street) >= 4.0 THEN 'Leave As Is'
+        WHEN AVG(safetyrating) OVER (PARTITION BY street) < 2.5 THEN 'Remove'
+        ELSE 'Improvements Needed'
+    END AS label
+FROM CityBikeLanes;
