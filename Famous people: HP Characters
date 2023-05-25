@@ -1,0 +1,82 @@
+/* Create table about the people and what they do here */
+
+CREATE TABLE characters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    house_id INTEGER,
+    fav_subject_id INTEGER,
+    current_student TEXT
+    );
+
+CREATE TABLE houses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    head_id INTEGER
+    );
+
+CREATE TABLE subjects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    prof_id INTEGER
+    );
+    
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Hermione Granger", 1, 6, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Harry Potter", 1, 5, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Ron Weasley", 1, 3, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Pavarti Patil", 1, 2, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Padma Patil", 3, 7, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Su Li", 3, 1, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Michael Corner", 3, 2, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Draco Malfoy", 4, 1, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Pansy Parkinson", 4, 5, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Blaise Zabini", 4, 4, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Zacharias Smith", 2, 7, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Susan Bones", 2, 3, "Y");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Minerva McGonagall", 1, 2, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Filius Flitwick", 3, 3, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Pomona Sprout", 2, 4, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Severus Snape", 4, 5, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Remus Lupin", 1, 1, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Cuthbert Binns", 3, 6, "N");
+INSERT INTO characters (name, house_id, fav_subject_id, current_student) VALUES ("Aurora Sinistra", 4, 7, "N");
+
+INSERT INTO houses (name, head_id) VALUES ("Gryffindor", 13);
+INSERT INTO houses (name, head_id) VALUES ("Hufflepuff", 15);
+INSERT INTO houses (name, head_id) VALUES ("Ravenclaw", 14);
+INSERT INTO houses (name, head_id) VALUES ("Slytherin", 16);
+
+INSERT INTO subjects (name, prof_id) VALUES ("Potions", 16);
+INSERT INTO subjects (name, prof_id) VALUES ("Transfiguration", 13);
+INSERT INTO subjects (name, prof_id) VALUES ("Charms", 14);
+INSERT INTO subjects (name, prof_id) VALUES ("Herbology", 15);
+INSERT INTO subjects (name, prof_id) VALUES ("Defense", 17);
+INSERT INTO subjects (name, prof_id) VALUES ("History", 18);
+INSERT INTO subjects (name, prof_id) VALUES ("Astronomy", 19);
+
+/*Get each student's name, house, and head of house.*/
+SELECT c.name, h.name AS house, hc.name AS head_of_house 
+    FROM characters c
+    JOIN houses h
+        ON c.house_id = h.id
+    JOIN characters hc
+        ON h.head_id = hc.id
+    WHERE c.current_student = "Y"
+    ORDER BY h.name;
+
+/*Get each professor's subject and house they head, if any.*/
+SELECT c.name, s.name AS subject, h.name AS head_of
+    FROM characters c
+    JOIN subjects s
+        ON s.prof_id = c.id
+    LEFT OUTER JOIN houses h
+        ON h.head_id = c.id
+    ORDER BY c.name;
+
+/*Get a count of how many students are in each house.*/
+SELECT h.name AS house, COUNT(*) AS student_count
+    FROM characters c
+    JOIN houses h
+        ON h.id = c.house_id
+    WHERE c.current_student = "Y"
+    GROUP BY h.name
+    ORDER BY student_count DESC;
