@@ -50,3 +50,11 @@ SELECT COUNT(DISTINCT c.acctnum), AVG(Quantity*Price) AS Avg_Amount_Spent
     WHERE length(orderID) = 6
     AND orderID <> 'Order ID'
     AND Quantity > 2;
+
+/*Select products and quantity sold in Los Angeles in February.*/
+SELECT Product, SUM(Quantity) AS Total_Quantity 
+    FROM BIT_DB.FebSales
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    AND location LIKE '%Los Angeles%'
+    GROUP BY Product;
