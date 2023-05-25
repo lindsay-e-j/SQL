@@ -43,3 +43,14 @@ SELECT track_name, artist_name, tempo, (danceability - (SELECT AVG(danceability)
     GROUP  BY track_name
     ORDER BY tempo DESC    
     LIMIT 10;
+    
+/*What is the average popularity of the top artists on spotify, after averaging all songs' popularity?*/
+WITH tempTable AS (
+    SELECT artist_name, AVG(popularity) AS average_popularity
+    FROM Spotifydata s
+    GROUP BY artist_name
+)
+SELECT artist_name, 'Top Star' AS tag, average_popularity
+    FROM tempTable
+    WHERE average_popularity >= 90
+    ORDER BY average_popularity DESC;
