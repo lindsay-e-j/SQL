@@ -1,0 +1,52 @@
+/*In this SQL, I'm querying a database with multiple tables in it to quantify statistics about customer and order data.*/
+
+/*Select count of orders placed in January.*/
+SELECT COUNT(*)
+    FROM BIT_DB.JanSales
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID';
+    
+/*Select count of orders for iPhones in January.*/
+SELECT COUNT(*)
+    FROM BIT_DB.JanSales
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    AND Product ='iPhone';
+
+/*Select all customer account numbers for February orders.*/
+SELECT c.acctnum
+    FROM BIT_DB.FebSales fs
+    INNER JOIN BIT_DB.customers c ON fs.orderID = c.order_id
+    WHERE length(fs.orderID) = 6
+    AND fs.orderID <> 'Order ID';
+
+/*Select cheapest product (and price) sold in January.*/
+SELECT js.Product, js.Price
+    FROM BIT_DB.JanSales js
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    AND js.Price = (SELECT MIN(Price) FROM BIT_DB.JanSales)
+    GROUP BY js.Product;
+
+/*Select total revenue per product in January.*/
+SELECT Product, SUM(Quantity)*Price AS Revenue
+    FROM BIT_DB.JanSales
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    GROUP BY Product;
+
+/*Select all products sold at specific location in February.*/
+SELECT Product, SUM(Quantity) AS Quantity, (Price * Quantity) AS Revenue
+    FROM BIT_DB.FebSales
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    AND location = '548 Lincoln St, Seattle, WA 98101'
+    GROUP BY Product;
+
+/*Select information on customers multi-ordering in February.*/
+SELECT COUNT(DISTINCT c.acctnum), AVG(Quantity*Price) AS Avg_Amount_Spent
+    FROM BIT_DB.FebSales fs
+    INNER JOIN BIT_DB.customers c ON fs.orderID = c.order_id
+    WHERE length(orderID) = 6
+    AND orderID <> 'Order ID'
+    AND Quantity > 2;
