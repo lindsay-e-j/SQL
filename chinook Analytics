@@ -1,0 +1,61 @@
+--This SQL is analyzing data from chinook.
+
+--How many playlists are the top 50 most popular tracks on, and what are those tracks?
+SELECT t.name AS title, art.name AS artist, COUNT(pt.trackid) AS number_of_playlists
+    FROM tracks t
+    INNER JOIN playlist_track pt ON pt.trackid = t.trackid
+    INNER JOIN albums alb ON t.albumid = alb.albumid
+    INNER JOIN artists art ON alb.artistid = art.artistid
+    GROUP BY t.trackid
+    ORDER BY number_of_playlists DESC, t.composer ASC
+    LIMIT 50;
+
+--Show each track's name, artist, album, genre, media type, and number of invoices.
+SELECT t.name AS title, art.name AS artist, alb.title AS album, gen.name AS genre, med.name AS media_type, COUNT(ii.trackid) AS number_of_invoices
+    FROM tracks t
+    INNER JOIN albums alb ON t.albumid = alb.albumid
+    INNER JOIN artists art ON alb.artistid = art.ArtistId
+    INNER JOIN genres gen ON t.genreid = gen.genreid
+    INNER JOIN media_types med ON t.mediatypeid = med.mediatypeid
+    INNER JOIN invoice_items ii ON t.trackid = ii.trackid
+    GROUP BY ii.trackid
+    ORDER BY artist ASC, number_of_invoices DESC;
+
+--How much money did the 5 least popular tracks make in 2011 and what were they?
+SELECT t.name, SUM(ii.unitprice * ii.quantity) AS revenue
+    FROM tracks t
+    INNER JOIN invoice_items ii ON t.trackid = ii.trackid
+    INNER JOIN invoices i ON ii.invoiceid = i.invoiceid
+    WHERE i.invoicedate LIKE '%2011%'
+    GROUP BY t.name
+    ORDER BY revenue ASC
+    LIMIT 5; 
+
+--What were the total sales per year?
+
+SELECT 
+    CASE
+        WHEN i.invoicedate LIKE '%2009%' THEN '2009'
+        WHEN i.invoicedate LIKE '%2010%' THEN '2010'
+        WHEN i.invoicedate LIKE '%2011%' THEN '2011'
+        WHEN i.invoicedate LIKE '%2012%' THEN '2012'
+        WHEN i.invoicedate LIKE '%2013%' THEN '2013'
+        ELSE 'No year'
+    END AS year, ROUND(SUM(unitprice*quantity), 2) AS total_revenue
+    FROM invoice_items ii
+    INNER JOIN invoices i ON ii.invoiceid = i.invoiceid
+    GROUP BY year;
+
+--List all of the billing countries in the data, as well as the number of invoices from those countries.
+SELECT DISTINCT billingcountry, COUNT(invoiceid) AS number_of_invoices
+    FROM invoices
+    GROUP BY billingcountry
+    ORDER BY number_of_invoices DESC;
+
+--Show the invoice total, customer name, country, and sales agent name for all invoices.
+SELECT SUM(ii.unitprice*ii.quantity) AS invoice_total, c.firstname || ' ' || c.lastname AS customer_name,c.country, e.firstname || ' ' || e.lastname AS sales_agent
+    FROM invoices i
+    INNER JOIN invoice_items ii ON i.invoiceid = ii.invoiceid
+    INNER JOIN customers c ON i.customerid = c.customerid
+    INNER JOIN employees e ON c.supportrepid = e.employeeid
+    GROUP BY i.invoiceid;
